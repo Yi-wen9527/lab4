@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气信息</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+     .container {
+            margin-top: 50px;
+        }
+     .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">欧洲城市天气信息</h1>
+        <div id="weather-data" class="row"></div>
+        <div class="text-center">
+            <button class="btn btn-primary" onclick="updateWeather()">更新天气数据</button>
+        </div>
+    </div>
+
+    <!-- 引入 jQuery 和 Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        async function updateWeather() {
+            const response = await fetch('/update');
+            const data = await response.json();
+            const weatherDataDiv = document.getElementById('weather-data');
+            weatherDataDiv.innerHTML = '';
+
+            data.forEach(city => {
+                const card = `
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${city.capital}</h5>
+                                <p class="card-text">温度: ${city.temperature}°C</p>
+                                <button class="btn btn-danger" onclick="removeCity('${city.capital}')">删除城市</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                weatherDataDiv.innerHTML += card;
+            });
+        }
+
+        async function removeCity(cityName) {
+            const response = await fetch(`/remove_city/${cityName}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            alert(result.message);
+            updateWeather();
+        }
+    </script>
+</body>
+</html>
+
+
